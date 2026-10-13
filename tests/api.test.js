@@ -183,3 +183,19 @@ describe('upload token endpoint', () => {
     expect((await call(upload, { method: 'GET' })).status).toBe(405);
   });
 });
+
+describe('health check', () => {
+  it('reports missing config without leaking secrets', async () => {
+    const h = (await import('../api/health.js')).default;
+    const t = process.env.BLOB_READ_WRITE_TOKEN;
+    delete process.env.BLOB_READ_WRITE_TOKEN;
+    let r = await call(h);
+    expect(r.status).toBe(503);
+    expect(r.body.problems.join(' ')).toMatch(/Blob storage is not connected/);
+    expect(JSON.stringify(r.body)).not.toContain(process.env.MONGODB_URI);
+    process.env.BLOB_READ_WRITE_TOKEN = t;
+    r = await call(h);
+    expect(r.status).toBe(200);
+    expect(r.body).toMatchObject({ mongo: 'ok', blobTokenSet: true, problems: [] });
+  });
+});

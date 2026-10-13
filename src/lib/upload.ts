@@ -62,7 +62,7 @@ export async function uploadFile(
     });
   } catch (e) {
     if (signal.aborted) throw new UploadAborted();
-    throw new Error(friendly(e));
+    throw new Error(await explain(e));
   }
 
   emit(file.size, true);
@@ -76,9 +76,17 @@ export async function uploadFile(
   return data as Result;
 }
 
-function friendly(e: unknown): string {
+/** Turn a vague client error into the real reason (asks the server what is misconfigured). */
+async function explain(e: unknown): Promise<string> {
+  try {
+    const r = await fetch('/api/health', { cache: 'no-store' });
+    const h = await r.json();
+    if (h?.problems?.length) return `Setup problem: ${h.problems[0]}`;
+  } catch {
+    /* health unreachable: fall through */
+  }
   const m = e instanceof Error ? e.message : '';
-  if (/maximum|too large|size/i.test(m)) return `That file is too big. The limit is ${MAX_MB} MB.`;
-  if (/fetch|network|failed to/i.test(m)) return 'Connection lost. Check your network and try again.';
-  return m || 'Upload failed. Please try again.';
+  if (/maximum|too large/i.test(m)) return `That file is too big. The limit is ${MAX_MB} MB.`;
+  if (!navigator.onLine) return 'You appear to be offline. Check your network and try again.';
+  return m ? `Upload failed: ${m}` : 'Upload failed. Please try again.';
 }
