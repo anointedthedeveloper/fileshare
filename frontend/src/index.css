@@ -1,0 +1,40 @@
+@import '@fontsource-variable/inter';
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html { -webkit-text-size-adjust: 100%; }
+  body { @apply bg-paper font-sans text-ink antialiased; font-feature-settings: 'cv11', 'ss01'; }
+  ::selection { background: #cfe3e4; }
+  :focus-visible { @apply outline-none ring-2 ring-accent/40 ring-offset-2 ring-offset-paper; }
+}
+
+@layer components {
+  .card { @apply rounded-xl border border-line bg-white shadow-card; }
+  .btn { @apply inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-medium transition duration-200 disabled:cursor-not-allowed disabled:opacity-50 active:translate-y-px; }
+  .btn-primary { @apply btn bg-accent text-white hover:bg-accent-hover; }
+  .btn-secondary { @apply btn border border-line-strong bg-white text-ink-soft hover:border-ink-faint hover:bg-paper; }
+  .btn-ghost { @apply btn text-ink-muted hover:bg-stone-100 hover:text-ink; }
+  .btn-danger { @apply btn border border-danger-line bg-white text-danger hover:bg-danger-soft; }
+  .input { @apply w-full rounded-lg border border-line-strong bg-white px-3 py-2.5 text-sm text-ink placeholder:text-ink-faint transition duration-150 hover:border-ink-faint focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/20; }
+  .label { @apply mb-1.5 block text-xs font-medium uppercase tracking-wide text-ink-muted; }
+  .badge { @apply inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-xs font-medium; }
+}
+
+.dots {
+  background-image: radial-gradient(#e0ddda 1px, transparent 1px);
+  background-size: 22px 22px;
+  mask-image: linear-gradient(to bottom, black 0%, transparent 70%);
+  -webkit-mask-image: linear-gradient(to bottom, black 0%, transparent 70%);
+}
+
+.stagger > * { animation: fade-up .55s cubic-bezier(.2,.7,.2,1) both; }
+.stagger > *:nth-child(2) { animation-delay: .06s; }
+.stagger > *:nth-child(3) { animation-delay: .12s; }
+.stagger > *:nth-child(4) { animation-delay: .18s; }
+.stagger > *:nth-child(5) { animation-delay: .24s; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .001ms !important; animation-delay: 0ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; }
+}
